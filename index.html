@@ -5,11 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Estrai Riga Casuale</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f5f7fa;
+    :root {
+      --bg-main: #121212;
+      --bg-card: #1e1e1e;
+      --text-primary: #e0e0e0;
+      --text-secondary: #a0a0a0;
+      --accent: #7c4dff;
+      --accent-hover: #651fff;
+      --border: #333;
+      --input-bg: #2d2d2d;
+    }
+
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-main);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 1rem;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -17,18 +36,23 @@
     }
 
     .container {
-      background: white;
+      background: var(--bg-card);
       padding: 2rem;
       border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
       width: 90%;
       max-width: 600px;
       text-align: center;
     }
 
     h1 {
-      margin-bottom: 1rem;
-      color: #333;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
     }
 
     textarea {
@@ -37,59 +61,327 @@
       padding: 1rem;
       font-size: 1rem;
       border-radius: 8px;
-      border: 1px solid #ccc;
-      resize: none;
+      border: 1px solid var(--border);
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+      resize: vertical;
       box-sizing: border-box;
+      min-height: 120px;
+      max-height: 300px;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.3);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 1.5rem;
     }
 
     button {
-      margin-top: 1rem;
       padding: 0.75rem 1.5rem;
       font-size: 1rem;
-      background-color: #0077cc;
+      background-color: var(--accent);
       color: white;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: background 0.2s ease, transform 0.1s ease;
     }
 
     button:hover {
-      background-color: #005fa3;
+      background-color: var(--accent-hover);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .secondary-button {
+      background-color: var(--border);
+    }
+
+    .secondary-button:hover {
+      background-color: #444;
+    }
+
+    #output-container {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      border-radius: 8px;
+      background-color: var(--input-bg);
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     #output {
-      margin-top: 1.5rem;
       font-size: 1.2rem;
       word-wrap: break-word;
+      color: var(--text-primary);
+    }
+
+    #output a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    #output a:hover {
+      text-decoration: underline;
+    }
+
+    .history-container {
+      margin-top: 1.5rem;
+      text-align: left;
+      max-height: 150px;
+      overflow-y: auto;
+      background-color: var(--input-bg);
+      border-radius: 8px;
+      padding: 0.5rem;
+    }
+
+    .history-item {
+      padding: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .history-item:last-child {
+      border-bottom: none;
+    }
+
+    .history-text {
+      flex-grow: 1;
+      margin-right: 0.5rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .history-button {
+      background-color: transparent;
+      color: var(--text-secondary);
+      padding: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    .history-button:hover {
+      color: var(--text-primary);
+      background-color: transparent;
+    }
+
+    .settings {
+      margin-top: 1.5rem;
+      text-align: left;
+    }
+
+    .settings-title {
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+      color: var(--text-secondary);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .checkbox-group input {
+      margin-right: 0.5rem;
+    }
+
+    .counter {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 600px) {
+      .button-group {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Estrai una riga casuale</h1>
-    <textarea id="textInput" placeholder="Incolla qui il tuo testo multilinea..."></textarea>
-    <button onclick="pickRandomLine()">Estrai Riga</button>
-    <div id="output"></div>
+    
+    <div class="input-group">
+      <textarea id="textInput" placeholder="Incolla qui il tuo testo multilinea..."></textarea>
+    </div>
+    
+    <div class="button-group">
+      <button id="extractButton" onclick="pickRandomLine()">Estrai Riga</button>
+      <button class="secondary-button" onclick="clearOutput()">Pulisci Output</button>
+      <button class="secondary-button" onclick="clearAll()">Pulisci Tutto</button>
+    </div>
+    
+    <div id="output-container">
+      <div id="output">Il risultato apparirà qui</div>
+    </div>
+    
+    <div class="counter">
+      <span id="lineCount">0</span> righe presenti
+    </div>
+    
+    <div class="settings">
+      <h3 class="settings-title">Opzioni</h3>
+      <div class="checkbox-group">
+        <input type="checkbox" id="saveHistory" checked>
+        <label for="saveHistory">Salva cronologia estrazioni</label>
+      </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="removeEmptyLines" checked>
+        <label for="removeEmptyLines">Ignora righe vuote</label>
+      </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="removeDuplicates">
+        <label for="removeDuplicates">Ignora righe duplicate</label>
+      </div>
+    </div>
+    
+    <div class="history-container" id="historyContainer" style="display: none;">
+      <h3 class="settings-title">Cronologia estrazioni</h3>
+      <div id="history"></div>
+    </div>
   </div>
 
   <script>
+    // Inizializza contatore righe
+    updateLineCount();
+    
+    // Aggiorna contatore quando cambia il testo
+    document.getElementById("textInput").addEventListener("input", updateLineCount);
+    
+    function updateLineCount() {
+      const text = document.getElementById("textInput").value;
+      const removeEmpty = document.getElementById("removeEmptyLines").checked;
+      const removeDupes = document.getElementById("removeDuplicates").checked;
+      
+      let lines = text.split(/\r?\n/);
+      
+      if (removeEmpty) {
+        lines = lines.filter(line => line.trim() !== "");
+      }
+      
+      if (removeDupes) {
+        lines = [...new Set(lines)];
+      }
+      
+      document.getElementById("lineCount").textContent = lines.length;
+    }
+
     function pickRandomLine() {
       const text = document.getElementById("textInput").value;
-      const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
+      const removeEmpty = document.getElementById("removeEmptyLines").checked;
+      const removeDupes = document.getElementById("removeDuplicates").checked;
+      
+      let lines = text.split(/\r?\n/);
+      
+      if (removeEmpty) {
+        lines = lines.filter(line => line.trim() !== "");
+      }
+      
+      if (removeDupes) {
+        lines = [...new Set(lines)];
+      }
+      
       if (lines.length === 0) {
         document.getElementById("output").innerHTML = "Nessuna riga valida trovata.";
         return;
       }
 
       const randomLine = lines[Math.floor(Math.random() * lines.length)].trim();
+      
+      // Salva nella cronologia se opzione attivata
+      if (document.getElementById("saveHistory").checked) {
+        addToHistory(randomLine);
+      }
 
-      if (randomLine.startsWith("http://") || randomLine.startsWith("https://")) {
-        document.getElementById("output").innerHTML = `<a href="${randomLine}" target="_blank">${randomLine}</a>`;
+      displayOutput(randomLine);
+      
+      // Effetto visivo per indicare nuovo risultato
+      const outputContainer = document.getElementById("output-container");
+      outputContainer.style.backgroundColor = "#3d2e63";
+      setTimeout(() => {
+        outputContainer.style.backgroundColor = "";
+      }, 300);
+    }
+    
+    function displayOutput(text) {
+      const output = document.getElementById("output");
+      
+      if (text.startsWith("http://") || text.startsWith("https://")) {
+        output.innerHTML = `<a href="${text}" target="_blank">${text}</a>`;
       } else {
-        document.getElementById("output").textContent = randomLine;
+        output.textContent = text;
       }
     }
+    
+    function addToHistory(text) {
+      const historyContainer = document.getElementById("historyContainer");
+      const history = document.getElementById("history");
+      
+      // Mostra il contenitore della cronologia se nascosto
+      if (historyContainer.style.display === "none") {
+        historyContainer.style.display = "block";
+      }
+      
+      const item = document.createElement("div");
+      item.className = "history-item";
+      
+      const itemText = document.createElement("div");
+      itemText.className = "history-text";
+      itemText.textContent = text;
+      
+      const itemActions = document.createElement("div");
+      itemActions.className = "history-actions";
+      
+      const useButton = document.createElement("button");
+      useButton.className = "history-button";
+      useButton.textContent = "Usa";
+      useButton.onclick = function() {
+        displayOutput(text);
+      };
+      
+      itemActions.appendChild(useButton);
+      item.appendChild(itemText);
+      item.appendChild(itemActions);
+      
+      // Aggiungi elemento all'inizio della cronologia
+      history.insertBefore(item, history.firstChild);
+    }
+    
+    function clearOutput() {
+      document.getElementById("output").textContent = "Il risultato apparirà qui";
+    }
+    
+    function clearAll() {
+      document.getElementById("textInput").value = "";
+      document.getElementById("output").textContent = "Il risultato apparirà qui";
+      document.getElementById("history").innerHTML = "";
+      document.getElementById("historyContainer").style.display = "none";
+      updateLineCount();
+    }
+    
+    // Aggiorna contatore quando cambiano le opzioni
+    document.getElementById("removeEmptyLines").addEventListener("change", updateLineCount);
+    document.getElementById("removeDuplicates").addEventListener("change", updateLineCount);
   </script>
 </body>
 </html>
