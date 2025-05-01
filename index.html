@@ -200,8 +200,25 @@
       margin-bottom: 0.5rem;
     }
 
-    .checkbox-group input {
+    .checkbox-group     input {
       margin-right: 0.5rem;
+    }
+    
+    .exclude-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+      box-sizing: border-box;
+    }
+    
+    .exclude-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.3);
     }
 
     .counter {
@@ -223,6 +240,10 @@
     
     <div class="input-group">
       <textarea id="textInput" placeholder="Incolla qui il tuo testo multilinea..."></textarea>
+    </div>
+    
+    <div class="input-group" style="margin-top: 1rem;">
+      <input type="text" id="excludeWords" placeholder="Parole da escludere (separate da virgola)..." class="exclude-input">
     </div>
     
     <div class="button-group">
@@ -270,6 +291,7 @@
     
     function updateLineCount() {
       const text = document.getElementById("textInput").value;
+      const excludeWordsText = document.getElementById("excludeWords").value.trim();
       const removeEmpty = document.getElementById("removeEmptyLines").checked;
       const removeDupes = document.getElementById("removeDuplicates").checked;
       
@@ -281,6 +303,16 @@
       
       if (removeDupes) {
         lines = [...new Set(lines)];
+      }
+      
+      // Applica filtro parole escluse per aggiornare conteggio
+      if (excludeWordsText !== "") {
+        const excludeWords = excludeWordsText.split(",").map(word => word.trim().toLowerCase());
+        
+        lines = lines.filter(line => {
+          const lowerLine = line.toLowerCase();
+          return !excludeWords.some(word => lowerLine.includes(word));
+        });
       }
       
       document.getElementById("lineCount").textContent = lines.length;
@@ -288,6 +320,7 @@
 
     function pickRandomLine() {
       const text = document.getElementById("textInput").value;
+      const excludeWordsText = document.getElementById("excludeWords").value.trim();
       const removeEmpty = document.getElementById("removeEmptyLines").checked;
       const removeDupes = document.getElementById("removeDuplicates").checked;
       
@@ -299,6 +332,17 @@
       
       if (removeDupes) {
         lines = [...new Set(lines)];
+      }
+      
+      // Filtra per parole da escludere
+      if (excludeWordsText !== "") {
+        const excludeWords = excludeWordsText.split(",").map(word => word.trim().toLowerCase());
+        
+        // Filtra le linee che non contengono nessuna delle parole da escludere
+        lines = lines.filter(line => {
+          const lowerLine = line.toLowerCase();
+          return !excludeWords.some(word => lowerLine.includes(word));
+        });
       }
       
       if (lines.length === 0) {
@@ -373,15 +417,17 @@
     
     function clearAll() {
       document.getElementById("textInput").value = "";
+      document.getElementById("excludeWords").value = "";
       document.getElementById("output").textContent = "Il risultato apparirà qui";
       document.getElementById("history").innerHTML = "";
       document.getElementById("historyContainer").style.display = "none";
       updateLineCount();
     }
     
-    // Aggiorna contatore quando cambiano le opzioni
+    // Aggiorna contatore quando cambiano le opzioni o quando cambia il testo di esclusione
     document.getElementById("removeEmptyLines").addEventListener("change", updateLineCount);
     document.getElementById("removeDuplicates").addEventListener("change", updateLineCount);
+    document.getElementById("excludeWords").addEventListener("input", updateLineCount);
   </script>
 </body>
 </html>
