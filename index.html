@@ -250,6 +250,7 @@
       <button id="extractButton" onclick="pickRandomLine()">Estrai Riga</button>
       <button class="secondary-button" onclick="clearOutput()">Pulisci Output</button>
       <button class="secondary-button" onclick="clearAll()">Pulisci Tutto</button>
+      <button class="secondary-button" onclick="pasteClipboard()">Incolla Appunti</button>
     </div>
     
     <div id="output-container">
@@ -428,6 +429,19 @@
     document.getElementById("removeEmptyLines").addEventListener("change", updateLineCount);
     document.getElementById("removeDuplicates").addEventListener("change", updateLineCount);
     document.getElementById("excludeWords").addEventListener("input", updateLineCount);
+
+    async function pasteClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+    const textArea = document.getElementById("textInput");
+    textArea.value = text; // Sostituisce il contenuto
+    updateLineCount();
+  } catch (err) {
+    alert("Impossibile accedere agli appunti: " + err);
+  }
+}
+
   </script>
 </body>
 </html>
+
